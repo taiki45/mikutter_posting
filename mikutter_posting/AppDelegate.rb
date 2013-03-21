@@ -79,7 +79,7 @@ class AppDelegate
       @thread = Thread.new do
         loop do
           Thread.start(@server.accept) do |s|
-            res = JSON.parse(s.read.chomp)
+            res = JSON.parse(s.gets)
             set_reply("@#{res['screen_name']} ")
             msg = @queue.pop
             s.write(msg)
