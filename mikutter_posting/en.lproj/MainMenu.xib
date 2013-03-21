@@ -1512,7 +1512,7 @@
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSTextFieldCell" key="NSCell" id="675343062">
 								<int key="NSCellFlags">-1805647871</int>
-								<int key="NSCellFlags2">1346371584</int>
+								<int key="NSCellFlags2">272629760</int>
 								<string key="NSContents"/>
 								<reference key="NSSupport" ref="62668570"/>
 								<string key="NSCellIdentifier">_NS:9</string>
@@ -1527,7 +1527,6 @@
 					<string key="NSFrameSize">{403, 214}</string>
 					<reference key="NSSuperview"/>
 					<reference key="NSWindow"/>
-					<reference key="NSNextKeyView"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {2560, 1418}}</string>
 				<string key="NSMaxSize">{10000000000000, 10000000000000}</string>
