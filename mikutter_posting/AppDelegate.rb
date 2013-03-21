@@ -6,6 +6,8 @@
 #  Copyright 2013 osakana. All rights reserved.
 #
 require 'socket'
+require 'json'
+require 'thread'
 
 class AppDelegate
   attr_accessor :window
@@ -28,7 +30,11 @@ class AppDelegate
   end
   
   def send_text(sender)
-    client {|s| s.write(tweet_box.stringValue) }
+    if queue.num_waiting > 0
+      queue.push(tweet_box.stringValue)
+    else
+      client {|s| s.write(tweet_box.stringValue) }
+    end
     clear
   end
   
@@ -43,13 +49,18 @@ class AppDelegate
 
   private
 
+  def queue
+    @queue ||= Queue.new
+  end
+
   def server_port
     port_box.intValue + 1
   end
 
   def start_server(port)
     @server.kill if @server
-    @server = Server.new(port)
+    @server = Server.new(port, tweet_box, queue)
+    @server.run
   end
 
   def stop_server
@@ -58,23 +69,34 @@ class AppDelegate
   end
 
   class Server
-    def initialize(port)
+    def initialize(port, tweet_box, queue)
       @server = TCPServer.open(port)
+      @tweet_box = tweet_box
+      @queue = queue
     end
 
     def run
       @thread = Thread.new do
         loop do
           Thread.start(@server.accept) do |s|
-            lambda {|res| res }.call(s.read)
+            res = JSON.parse(s.read.chomp)
+            set_reply("@#{res['screen_name']} ")
+            msg = @queue.pop
+            s.write(msg)
             s.close
           end
         end
       end
     end
 
-    def stop
-      @thread.kill
+    def kill
+      @thread.kill if @thread
+    end
+
+    private
+
+    def set_reply(str)
+      @tweet_box.setStringValue(str)
     end
   end
 end
